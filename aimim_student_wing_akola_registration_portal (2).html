@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIMIM Student Wing Akola - Registration Portal</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- html2canvas for ID card download -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        aimim: {
+                            green: '#006837',
+                            darkGreen: '#004d28',
+                            lightGreen: '#e6f2ed',
+                            gold: '#d4af37'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f4f7f5;
+        }
+        .id-card-shadow {
+            box-shadow: 0 10px 30px -5px rgba(0, 104, 55, 0.3);
+        }
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #printableCard, #printableCard * {
+                visibility: visible;
+            }
+            #printableCard {
+                position: absolute;
+                left: 50%;
+                top: 50%;
+                transform: translate(-50%, -50%) scale(1.15);
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between text-gray-800">
+
+    <!-- TOP ANNOUNCEMENT BAR (CONTACT DETAILS) -->
+    <div class="bg-aimim-darkGreen text-white text-xs py-1.5 px-4">
+        <div class="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-2">
+            <div class="flex items-center gap-4 flex-wrap">
+                <a href="tel:9075345256" class="hover:text-aimim-gold transition flex items-center gap-1.5">
+                    <i class="fas fa-phone-alt text-aimim-gold"></i>
+                    <span>+91 9075345256</span>
+                </a>
+                <a href="mailto:AIMIMSTUDENTSWINGAKOLADISTRICT@GMAIL.COM" class="hover:text-aimim-gold transition flex items-center gap-1.5">
+                    <i class="fas fa-envelope text-aimim-gold"></i>
+                    <span class="lowercase">aimimstudentswingakoladistrict@gmail.com</span>
+                </a>
+            </div>
+            <div class="flex items-center gap-3">
+                <button onclick="toggleWebhookModal()" class="hover:text-aimim-gold transition text-[11px] underline flex items-center gap-1">
+                    <i class="fas fa-plug"></i>
+                    <span>Connect Google Sheet</span>
+                </button>
+                <button onclick="toggleGuideModal()" class="hover:text-aimim-gold transition text-[11px] bg-white/10 px-2 py-0.5 rounded border border-white/20">
+                    <i class="fas fa-circle-info"></i> Hosting & Data Guide
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN HEADER WITH LOGO -->
+    <header class="bg-aimim-green text-white shadow-lg sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between">
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="showPage('landing')">
+                <!-- AIMIM Official SVG Logo Vector -->
+                <div class="w-12 h-12 rounded-full bg-white p-1 flex items-center justify-center shadow-md flex-shrink-0">
+                    <svg viewBox="0 0 200 200" class="w-full h-full">
+                        <circle cx="100" cy="100" r="95" fill="#006837" stroke="#ffffff" stroke-width="4"/>
+                        <circle cx="100" cy="100" r="80" fill="none" stroke="#ffffff" stroke-width="2" stroke-dasharray="4 2"/>
+                        <!-- Kite Symbol -->
+                        <path d="M 100 35 L 145 95 L 100 155 L 55 95 Z" fill="#ffffff" />
+                        <line x1="100" y1="35" x2="100" y2="155" stroke="#006837" stroke-width="2"/>
+                        <line x1="55" y1="95" x2="145" y2="95" stroke="#006837" stroke-width="2"/>
+                        <circle cx="80" cy="80" r="10" fill="#006837"/>
+                        <circle cx="120" cy="80" r="10" fill="#006837"/>
+                        <path d="M 100 155 L 90 175 L 110 175 Z" fill="#ffffff"/>
+                        <polygon points="100,10 103,18 112,18 105,23 107,31 100,26 93,31 95,23 88,18 97,18" fill="#ffffff"/>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="text-base sm:text-xl font-bold tracking-wide uppercase leading-tight">AIMIM STUDENT WING</h1>
+                    <p class="text-xs text-aimim-gold font-semibold tracking-wider">AKOLA DISTRICT</p>
+                </div>
+            </div>
+            
+            <button onclick="showPage('regStep1')" class="hidden sm:flex bg-aimim-gold hover:bg-yellow-500 text-gray-900 text-xs sm:text-sm font-bold px-4 py-2 rounded-xl transition shadow items-center gap-2">
+                <i class="fas fa-user-plus"></i>
+                <span>Register Now</span>
+            </button>
+        </div>
+    </header>
+
+    <main class="flex-grow max-w-7xl w-full mx-auto p-4 sm:p-6">
+
+        <!-- 1. LANDING / HOME PAGE VIEW -->
+        <section id="landingPage" class="space-y-8 py-2">
+            
+            <!-- Hero Section -->
+            <div class="bg-gradient-to-r from-aimim-green via-aimim-darkGreen to-green-950 rounded-2xl text-white p-6 sm:p-10 shadow-xl relative overflow-hidden">
+                <div class="absolute -right-10 -bottom-10 opacity-10 text-white text-9xl font-bold pointer-events-none select-none">
+                    AIMIM
+                </div>
+                <div class="relative z-10 max-w-3xl space-y-4">
+                    <div class="inline-flex items-center gap-2 bg-aimim-gold/20 text-aimim-gold border border-aimim-gold/30 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider">
+                        <i class="fas fa-star text-aimim-gold"></i>
+                        <span>Official Membership Portal</span>
+                    </div>
+                    <h2 class="text-2xl sm:text-4xl font-extrabold leading-tight">Welcome to AIMIM Student Wing Akola Portal</h2>
+                    <p class="text-gray-200 text-sm sm:text-base leading-relaxed">
+                        Join the voice of student empowerment, social justice, and leadership in Akola district. Register yourself and receive your official digital Membership ID Card instantly.
+                    </p>
+                    
+                    <div class="pt-4 flex flex-wrap gap-4 items-center">
+                        <button onclick="showPage('regStep1')" class="bg-aimim-gold hover:bg-yellow-500 text-gray-900 font-bold px-8 py-3.5 rounded-xl shadow-lg hover:shadow-2xl transition transform hover:-translate-y-0.5 flex items-center gap-3 text-base sm:text-lg">
+                            <i class="fas fa-user-plus"></i>
+                            <span>JOIN AIMIM STUDENT WING</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Leadership Team Card Grid -->
+            <div class="space-y-4">
+                <div class="border-l-4 border-aimim-green pl-3 flex justify-between items-end">
+                    <div>
+                        <h3 class="text-xl font-bold text-gray-800">Akola District Leadership</h3>
+                        <p class="text-xs text-gray-500">AIMIM & Student Wing Office Bearers</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <!-- Leader 1 -->
+                    <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition flex flex-col items-center text-center">
+                        <div class="w-16 h-16 bg-aimim-lightGreen rounded-full flex items-center justify-center text-aimim-green text-2xl font-bold mb-3 shadow-inner">
+                            <i class="fas fa-user-shield"></i>
+                        </div>
+                        <h4 class="font-bold text-gray-900 text-base">SYED MOHSIN ALI SAHAB</h4>
+                        <p class="text-xs text-aimim-green font-semibold mt-1 bg-aimim-lightGreen px-3 py-1 rounded-full">AKOLA DIST AIMIM PRESIDENT</p>
+                    </div>
+
+                    <!-- Leader 2 -->
+                    <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition flex flex-col items-center text-center">
+                        <div class="w-16 h-16 bg-aimim-lightGreen rounded-full flex items-center justify-center text-aimim-green text-2xl font-bold mb-3 shadow-inner">
+                            <i class="fas fa-user-graduate"></i>
+                        </div>
+                        <h4 class="font-bold text-gray-900 text-base">SYED HUZAIF</h4>
+                        <p class="text-xs text-aimim-green font-semibold mt-1 bg-aimim-lightGreen px-3 py-1 rounded-full">AKOLA DIST AIMIM STUDENT WING PRESIDENT</p>
+                    </div>
+
+                    <!-- Leader 3 -->
+                    <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition flex flex-col items-center text-center">
+                        <div class="w-16 h-16 bg-aimim-lightGreen rounded-full flex items-center justify-center text-aimim-green text-2xl font-bold mb-3 shadow-inner">
+                            <i class="fas fa-user-tie"></i>
+                        </div>
+                        <h4 class="font-bold text-gray-900 text-base">SYED SIRAJ ALI</h4>
+                        <p class="text-xs text-aimim-green font-semibold mt-1 bg-aimim-lightGreen px-3 py-1 rounded-full">AKOLA DIST AIMIM STUDENT WING VICE PRESIDENT</p>
+                    </div>
+
+                    <!-- Leader 4 -->
+                    <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition flex flex-col items-center text-center">
+                        <div class="w-16 h-16 bg-aimim-lightGreen rounded-full flex items-center justify-center text-aimim-green text-2xl font-bold mb-3 shadow-inner">
+                            <i class="fas fa-user-edit"></i>
+                        </div>
+                        <h4 class="font-bold text-gray-900 text-base">MOHAMMED DANISH</h4>
+                        <p class="text-xs text-aimim-green font-semibold mt-1 bg-aimim-lightGreen px-3 py-1 rounded-full">AKOLA DIST STUDENT WING AIMIM SECRETARY</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Join AIMIM Action Box -->
+            <div class="bg-white p-6 sm:p-8 rounded-2xl border border-gray-200 text-center space-y-4 shadow-sm">
+                <h3 class="text-lg sm:text-xl font-bold text-gray-800">Ready to Get Your Official Membership ID Card?</h3>
+                <p class="text-xs sm:text-sm text-gray-600 max-w-xl mx-auto">Fill in your details, capture a live camera selfie or upload a photo from gallery, and download your verified Membership ID Card instantly.</p>
+                <div>
+                    <button onclick="showPage('regStep1')" class="bg-aimim-green hover:bg-aimim-darkGreen text-white font-semibold px-8 py-3.5 rounded-xl transition shadow flex items-center justify-center gap-2 mx-auto">
+                        <i class="fas fa-id-card"></i>
+                        <span>JOIN AIMIM STUDENT WING</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Contact Box -->
+            <div class="bg-aimim-lightGreen p-6 rounded-2xl border border-aimim-green/20 flex flex-col md:flex-row items-center justify-between gap-4">
+                <div class="space-y-1 text-center md:text-left">
+                    <h4 class="font-bold text-gray-900 text-base">Need Help or Have Questions?</h4>
+                    <p class="text-xs text-gray-600">Contact AIMIM Student Wing Akola District Office</p>
+                </div>
+                <div class="flex flex-wrap gap-4 text-xs font-semibold text-aimim-green">
+                    <a href="tel:9075345256" class="bg-white px-4 py-2 rounded-xl shadow-sm border border-gray-200 flex items-center gap-2 hover:bg-gray-50">
+                        <i class="fas fa-phone"></i>
+                        <span>9075345256</span>
+                    </a>
+                    <a href="mailto:AIMIMSTUDENTSWINGAKOLADISTRICT@GMAIL.COM" class="bg-white px-4 py-2 rounded-xl shadow-sm border border-gray-200 flex items-center gap-2 hover:bg-gray-50">
+                        <i class="fas fa-envelope"></i>
+                        <span>AIMIMSTUDENTSWINGAKOLADISTRICT@GMAIL.COM</span>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. REGISTRATION STEP 1: FORM DETAILS -->
+        <section id="regStep1Page" class="hidden max-w-2xl mx-auto py-4">
+            <div class="bg-white rounded-2xl p-6 sm:p-8 shadow-md border border-gray-100 space-y-6">
+                
+                <!-- Step Header & Progress -->
+                <div>
+                    <div class="flex justify-between text-xs font-semibold text-gray-500 mb-2">
+                        <span class="text-aimim-green font-bold"><i class="fas fa-circle-check mr-1"></i>Step 1: Details Entry</span>
+                        <span>Step 2: Photo Selection</span>
+                    </div>
+                    <div class="w-full bg-gray-200 h-2 rounded-full overflow-hidden">
+                        <div class="bg-aimim-green h-full w-1/2 transition-all duration-300"></div>
+                    </div>
+                </div>
+
+                <div class="border-b pb-4">
+                    <h2 class="text-xl font-bold text-gray-800">Student Wing Registration Form</h2>
+                    <p class="text-xs text-gray-500">Fill out your details to obtain your official membership card.</p>
+                </div>
+
+                <form id="detailsForm" onsubmit="handleStep1Submit(event)" class="space-y-4">
+                    <!-- Full Name -->
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">Full Name *</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
+                                <i class="fas fa-user"></i>
+                            </span>
+                            <input type="text" id="fullName" required placeholder="Enter your full name" 
+                                class="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-aimim-green focus:border-aimim-green outline-none text-sm transition">
+                        </div>
+                    </div>
+
+                    <!-- Contact Number -->
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">Contact Number *</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
+                                <i class="fas fa-phone"></i>
+                            </span>
+                            <input type="tel" id="contactNumber" required pattern="[0-9]{10}" placeholder="10-digit Mobile Number" 
+                                class="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-aimim-green focus:border-aimim-green outline-none text-sm transition">
+                        </div>
+                    </div>
+
+                    <!-- Email ID -->
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">Email ID *</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
+                                <i class="fas fa-envelope"></i>
+                            </span>
+                            <input type="email" id="emailId" required placeholder="example@domain.com" 
+                                class="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-aimim-green focus:border-aimim-green outline-none text-sm transition">
+                        </div>
+                    </div>
+
+                    <!-- Full Address -->
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">Full Address (Akola) *</label>
+                        <div class="relative">
+                            <span class="absolute top-3 left-3 text-gray-400">
+                                <i class="fas fa-home"></i>
+                            </span>
+                            <textarea id="fullAddress" required rows="3" placeholder="House No, Area, Mohalla, Akola" 
+                                class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-300 focus:ring-2 focus:ring-aimim-green focus:border-aimim-green outline-none text-sm transition"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="flex gap-3 pt-4">
+                        <button type="button" onclick="showPage('landing')" class="w-1/3 py-3 border border-gray-300 text-gray-700 font-semibold rounded-xl hover:bg-gray-50 transition text-sm">
+                            Cancel
+                        </button>
+                        <button type="submit" class="w-2/3 bg-aimim-green hover:bg-aimim-darkGreen text-white font-semibold py-3 rounded-xl transition shadow flex items-center justify-center gap-2 text-sm">
+                            <span>Next: Photo Selection</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- 3. REGISTRATION STEP 2: LIVE CAMERA & GALLERY PHOTO SELECTION -->
+        <section id="regStep2Page" class="hidden max-w-2xl mx-auto py-4">
+            <div class="bg-white rounded-2xl p-6 sm:p-8 shadow-md border border-gray-100 space-y-6">
+                
+                <!-- Progress Bar -->
+                <div>
+                    <div class="flex justify-between text-xs font-semibold text-gray-500 mb-2">
+                        <span>Step 1: Details Entry</span>
+                        <span class="text-aimim-green font-bold"><i class="fas fa-circle-check mr-1"></i>Step 2: Photo Selection</span>
+                    </div>
+                    <div class="w-full bg-gray-200 h-2 rounded-full overflow-hidden">
+                        <div class="bg-aimim-green h-full w-full transition-all duration-300"></div>
+                    </div>
+                </div>
+
+                <div class="border-b pb-4">
+                    <h2 class="text-xl font-bold text-gray-800">Add Member Photograph</h2>
+                    <p class="text-xs text-gray-500">Take a live photo using your camera OR upload from your mobile gallery.</p>
+                </div>
+
+                <!-- Tab Toggle: Live Camera vs Gallery Upload -->
+                <div class="flex bg-gray-100 p-1 rounded-xl gap-1">
+                    <button id="tabCamera" onclick="switchPhotoTab('camera')" class="flex-1 py-2 rounded-lg text-xs font-bold transition bg-white text-aimim-green shadow-sm flex items-center justify-center gap-2">
+                        <i class="fas fa-camera"></i>
+                        <span>Live Camera</span>
+                    </button>
+                    <button id="tabGallery" onclick="switchPhotoTab('gallery')" class="flex-1 py-2 rounded-lg text-xs font-bold transition text-gray-600 flex items-center justify-center gap-2">
+                        <i class="fas fa-image"></i>
+                        <span>Upload from Gallery</span>
+                    </button>
+                </div>
+
+                <!-- CAMERA SECTION -->
+                <div id="cameraContainer" class="flex flex-col items-center justify-center space-y-4">
+                    <div class="relative w-full max-w-sm h-64 bg-black rounded-2xl overflow-hidden border-4 border-aimim-green shadow-inner flex items-center justify-center">
+                        <video id="webcam" autoplay playsinline class="w-full h-full object-cover"></video>
+                        <canvas id="photoCanvas" class="hidden w-full h-full object-cover"></canvas>
+                        
+                        <div id="cameraOverlay" class="absolute inset-0 border-2 border-dashed border-white/40 pointer-events-none rounded-xl m-4 flex items-center justify-center">
+                            <span class="text-white/70 text-xs bg-black/50 px-2.5 py-1 rounded-full">Face Center Here</span>
+                        </div>
+                    </div>
+
+                    <div id="cameraStatus" class="text-xs text-gray-500 text-center">
+                        Click "Capture Photo" when ready.
+                    </div>
+
+                    <div class="flex gap-3 w-full max-w-sm">
+                        <button id="captureBtn" onclick="takeSnapshot()" type="button" class="flex-1 bg-aimim-green hover:bg-aimim-darkGreen text-white font-semibold py-2.5 rounded-xl shadow transition text-sm flex items-center justify-center gap-2">
+                            <i class="fas fa-camera"></i>
+                            <span>Capture Photo</span>
+                        </button>
+                        
+                        <button id="retakeBtn" onclick="startCamera()" type="button" class="hidden flex-1 bg-gray-700 hover:bg-gray-800 text-white font-semibold py-2.5 rounded-xl shadow transition text-sm flex items-center justify-center gap-2">
+                            <i class="fas fa-rotate"></i>
+                            <span>Retake Photo</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- GALLERY UPLOAD SECTION -->
+                <div id="galleryContainer" class="hidden flex-col items-center justify-center space-y-4">
+                    <div class="w-full max-w-sm h-64 border-2 border-dashed border-aimim-green/50 bg-aimim-lightGreen/30 rounded-2xl flex flex-col items-center justify-center p-4 relative overflow-hidden">
+                        <img id="galleryPreview" class="hidden w-full h-full object-cover rounded-xl" src="" alt="Gallery Preview">
+                        
+                        <div id="uploadPrompt" class="text-center space-y-2">
+                            <div class="w-12 h-12 bg-aimim-green/10 text-aimim-green rounded-full flex items-center justify-center mx-auto text-xl">
+                                <i class="fas fa-cloud-arrow-up"></i>
+                            </div>
+                            <p class="text-xs font-semibold text-gray-700">Click below to choose image from Gallery</p>
+                            <p class="text-[10px] text-gray-400">Supports JPG, PNG, WEBP</p>
+                        </div>
+                    </div>
+
+                    <input type="file" id="fileInput" accept="image/*" onchange="handleFileUpload(event)" class="hidden">
+                    
+                    <button type="button" onclick="document.getElementById('fileInput').click()" class="bg-aimim-green hover:bg-aimim-darkGreen text-white font-semibold px-6 py-2.5 rounded-xl shadow transition text-sm flex items-center gap-2">
+                        <i class="fas fa-folder-open"></i>
+                        <span>Select Photo from Device</span>
+                    </button>
+                </div>
+
+                <!-- Registration Finalize Button -->
+                <div class="flex gap-3 pt-4 border-t">
+                    <button type="button" onclick="showPage('regStep1')" class="w-1/3 py-3 border border-gray-300 text-gray-700 font-semibold rounded-xl hover:bg-gray-50 transition text-sm">
+                        Back
+                    </button>
+                    <button type="button" id="finishRegBtn" onclick="completeRegistration()" disabled class="w-2/3 bg-gray-300 text-gray-500 cursor-not-allowed font-semibold py-3 rounded-xl transition shadow flex items-center justify-center gap-2 text-sm">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Complete & Generate ID</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. OFFICIAL ID CARD RESULT SECTION -->
+        <section id="idCardPage" class="hidden max-w-3xl mx-auto py-4 space-y-6">
+            
+            <div class="bg-green-50 border border-green-200 text-green-800 p-4 rounded-2xl flex items-center justify-between gap-3 text-sm">
+                <div class="flex items-center gap-3">
+                    <i class="fas fa-circle-check text-2xl text-green-600"></i>
+                    <div>
+                        <h4 class="font-bold">Registration Successful!</h4>
+                        <p class="text-xs">Your official AIMIM Student Wing Membership ID Card is generated.</p>
+                    </div>
+                </div>
+                <button onclick="downloadIDCard()" class="bg-aimim-green text-white text-xs px-3 py-1.5 rounded-lg shadow hover:bg-aimim-darkGreen transition">
+                    <i class="fas fa-download mr-1"></i> Save Card
+                </button>
+            </div>
+
+            <!-- ID CARD CONTAINER (Target for Print/Download) -->
+            <div class="flex justify-center p-2">
+                <div id="printableCard" class="w-full max-w-md bg-white rounded-2xl border-2 border-aimim-green overflow-hidden id-card-shadow relative">
+                    
+                    <!-- Card Top Header -->
+                    <div class="bg-aimim-green text-white p-4 text-center relative overflow-hidden">
+                        <div class="absolute -left-6 -top-6 w-20 h-20 bg-white/10 rounded-full"></div>
+                        <div class="absolute -right-6 -bottom-6 w-20 h-20 bg-white/10 rounded-full"></div>
+                        
+                        <div class="flex items-center justify-center gap-3 mb-1">
+                            <!-- SVG Logo inside Card Header -->
+                            <div class="w-11 h-11 rounded-full bg-white p-0.5 flex items-center justify-center shadow">
+                                <svg viewBox="0 0 200 200" class="w-full h-full">
+                                    <circle cx="100" cy="100" r="95" fill="#006837"/>
+                                    <path d="M 100 35 L 145 95 L 100 155 L 55 95 Z" fill="#ffffff" />
+                                    <circle cx="80" cy="80" r="10" fill="#006837"/>
+                                    <circle cx="120" cy="80" r="10" fill="#006837"/>
+                                </svg>
+                            </div>
+                            <div class="text-left">
+                                <h3 class="font-extrabold text-sm sm:text-base leading-tight uppercase">AIMIM STUDENT WING</h3>
+                                <p class="text-[10px] text-aimim-gold font-bold tracking-widest uppercase">DISTRICT AKOLA</p>
+                            </div>
+                        </div>
+                        <div class="bg-aimim-darkGreen text-[10px] font-bold py-0.5 px-3 rounded-full inline-block text-aimim-gold border border-aimim-gold/30 uppercase tracking-wider">
+                            OFFICIAL MEMBERSHIP CARD
+                        </div>
+                    </div>
+
+                    <!-- Card Body -->
+                    <div class="p-5 space-y-4">
+                        <div class="flex flex-col sm:flex-row items-center gap-4 border-b pb-4">
+                            <!-- User Photo Display -->
+                            <div class="w-28 h-32 bg-gray-100 rounded-xl border-2 border-aimim-green overflow-hidden flex-shrink-0 shadow">
+                                <img id="cardUserPhoto" src="" alt="Member Photo" class="w-full h-full object-cover">
+                            </div>
+
+                            <!-- Member Info -->
+                            <div class="space-y-1 text-center sm:text-left flex-grow">
+                                <div class="bg-aimim-lightGreen px-2.5 py-0.5 rounded text-[11px] font-bold text-aimim-green inline-block">
+                                    REG ID: <span id="cardRegNum" class="font-mono font-extrabold">AIMIM_STU-AGY-1001</span>
+                                </div>
+                                <h2 id="cardFullName" class="font-bold text-base sm:text-lg text-gray-900 leading-snug">Member Name</h2>
+                                <p class="text-xs text-gray-600"><i class="fas fa-phone text-aimim-green mr-1"></i> <span id="cardContact">9075345256</span></p>
+                                <p class="text-xs text-gray-600 truncate max-w-[200px]"><i class="fas fa-envelope text-aimim-green mr-1"></i> <span id="cardEmail">email@example.com</span></p>
+                                <p class="text-[11px] text-gray-500 line-clamp-2 mt-0.5"><i class="fas fa-map-marker-alt text-aimim-green mr-1"></i> <span id="cardAddress">Akola City</span></p>
+                            </div>
+                        </div>
+
+                        <!-- Leadership Names at Bottom of ID Card (Mandatory Requirement) -->
+                        <div>
+                            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2 text-center">Akola District Leadership</p>
+                            <div class="grid grid-cols-2 gap-2 text-[9px] bg-gray-50 p-2.5 rounded-xl border border-gray-100">
+                                <div>
+                                    <p class="font-bold text-gray-800 uppercase">Syed Mohsin Ali Sahab</p>
+                                    <p class="text-gray-500">Akola Dist AIMIM President</p>
+                                </div>
+                                <div>
+                                    <p class="font-bold text-gray-800 uppercase">Syed Huzaif</p>
+                                    <p class="text-gray-500">Akola Dist AIMIM Student Wing President</p>
+                                </div>
+                                <div>
+                                    <p class="font-bold text-gray-800 uppercase">Syed Siraj Ali</p>
+                                    <p class="text-gray-500">Akola Dist AIMIM Student Wing Vice President</p>
+                                </div>
+                                <div>
+                                    <p class="font-bold text-gray-800 uppercase">Mohammed Danish</p>
+                                    <p class="text-gray-500">Akola Dist Student Wing AIMIM Secretary</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card Footer Bar -->
+                    <div class="bg-gray-100 px-4 py-2 text-center border-t border-gray-200 text-[10px] text-gray-500 flex justify-between items-center">
+                        <span>AIMIM Akola District</span>
+                        <span class="font-semibold text-aimim-green"><i class="fas fa-certificate mr-1"></i>Verified Member</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex flex-wrap gap-3 justify-center pt-2">
+                <button onclick="downloadIDCard()" class="bg-aimim-green hover:bg-aimim-darkGreen text-white font-semibold px-6 py-2.5 rounded-xl shadow transition text-sm flex items-center gap-2">
+                    <i class="fas fa-download"></i>
+                    <span>Download Card Image</span>
+                </button>
+                <button onclick="window.print()" class="bg-gray-800 hover:bg-gray-900 text-white font-semibold px-6 py-2.5 rounded-xl shadow transition text-sm flex items-center gap-2">
+                    <i class="fas fa-print"></i>
+                    <span>Print Card</span>
+                </button>
+                <button onclick="showPage('landing')" class="border border-gray-300 text-gray-700 font-semibold px-6 py-2.5 rounded-xl hover:bg-gray-100 transition text-sm">
+                    Back to Home
+                </button>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- MODAL 1: GOOGLE SHEETS WEBHOOK SETTINGS -->
+    <div id="webhookModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
+            <div class="flex justify-between items-center border-b pb-3">
+                <h3 class="font-bold text-gray-800 text-base flex items-center gap-2">
+                    <i class="fas fa-table text-aimim-green"></i>
+                    <span>Google Sheets Integration</span>
+                </h3>
+                <button onclick="toggleWebhookModal()" class="text-gray-400 hover:text-gray-600 text-xl font-bold">&times;</button>
+            </div>
+
+            <p class="text-xs text-gray-600">
+                Enter your Google Apps Script Webhook URL below so every registration is automatically posted to your Google Sheet!
+            </p>
+
+            <div>
+                <label class="block text-xs font-semibold text-gray-700 mb-1">Google Apps Script Web App URL</label>
+                <input type="url" id="webhookUrlInput" placeholder="https://script.google.com/macros/s/.../exec" 
+                    class="w-full p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-aimim-green text-xs outline-none">
+            </div>
+
+            <div class="bg-gray-50 p-3 rounded-xl text-[11px] text-gray-500 border space-y-1">
+                <p class="font-bold text-gray-700"><i class="fas fa-lightbulb text-aimim-gold mr-1"></i> Quick Note:</p>
+                <p>If left blank, data is saved directly in your browser (LocalStorage). Refer to the Hosting & Data Guide for setup details.</p>
+            </div>
+
+            <div class="flex gap-2 justify-end pt-2">
+                <button onclick="saveWebhookUrl()" class="bg-aimim-green text-white font-semibold px-5 py-2 rounded-xl text-xs hover:bg-aimim-darkGreen transition">
+                    Save Webhook URL
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 2: HOSTING & DATA STORAGE INSTRUCTIONS -->
+    <div id="guideModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 space-y-5 shadow-2xl">
+            
+            <div class="flex justify-between items-center border-b pb-3">
+                <h3 class="text-lg font-bold text-gray-800 flex items-center gap-2">
+                    <i class="fas fa-globe text-aimim-green"></i>
+                    <span>Free Live Hosting & Google Sheets Integration</span>
+                </h3>
+                <button onclick="toggleGuideModal()" class="text-gray-400 hover:text-gray-600 text-xl font-bold">&times;</button>
+            </div>
+
+            <!-- Free Live Hosting Steps -->
+            <div class="space-y-3">
+                <h4 class="font-bold text-sm text-gray-800 flex items-center gap-2">
+                    <i class="fas fa-rocket text-aimim-green"></i> How to Live Host this Website 100% Free?
+                </h4>
+                
+                <div class="space-y-2 text-xs text-gray-600">
+                    <div class="p-3 bg-aimim-lightGreen rounded-xl border border-aimim-green/20 space-y-1">
+                        <p class="font-bold text-aimim-green">Option 1: GitHub Pages (Recommended)</p>
+                        <ol class="list-decimal pl-4 space-y-1">
+                            <li>Create a free account on <strong>GitHub.com</strong>.</li>
+                            <li>Create a new repository named <code class="bg-white px-1">aimim-akola-portal</code>.</li>
+                            <li>Upload this file saved as <code class="bg-white px-1">index.html</code>.</li>
+                            <li>Go to <strong>Settings &gt; Pages</strong> &rarr; Select <code class="bg-white px-1">main</code> branch &rarr; Click Save.</li>
+                            <li>Your portal is now live with a free SSL link (<code class="bg-white px-1">https://yourusername.github.io/aimim-akola-portal</code>).</li>
+                        </ol>
+                    </div>
+
+                    <div class="p-3 bg-gray-50 rounded-xl border space-y-1">
+                        <p class="font-bold text-gray-800">Option 2: Netlify Drag & Drop</p>
+                        <p>Go to <strong>Netlify.com</strong>, register free, drag and drop the folder containing <code class="bg-white px-1">index.html</code> and get a live shareable URL instantly.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Google Sheets Integration Script -->
+            <div class="space-y-3 border-t pt-3">
+                <h4 class="font-bold text-sm text-gray-800 flex items-center gap-2">
+                    <i class="fas fa-file-excel text-aimim-green"></i> Connecting Registration Data to Google Sheets
+                </h4>
+                <div class="text-xs text-gray-600 space-y-2">
+                    <p>1. Open Google Sheets and create a sheet named <strong>AIMIM Registrations</strong>.</p>
+                    <p>2. Go to <strong>Extensions &gt; Apps Script</strong> and paste this code:</p>
+                    <pre class="bg-gray-900 text-green-400 p-3 rounded-xl overflow-x-auto text-[10px] font-mono select-all">
+function doPost(e) {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  var data = JSON.parse(e.postData.contents);
+  sheet.appendRow([new Date(), data.regNum, data.fullName, data.contact, data.email, data.address, data.photo]);
+  return ContentService.createTextOutput(JSON.stringify({"status":"success"})).setMimeType(ContentService.MimeType.JSON);
+}</pre>
+                    <p>3. Click <strong>Deploy &gt; New Deployment &gt; Web App</strong>, select "Anyone" for access, copy the Web App URL, and paste it into the <strong>Connect Google Sheet</strong> setting above!</p>
+                </div>
+            </div>
+
+            <div class="pt-2 text-right">
+                <button onclick="toggleGuideModal()" class="bg-aimim-green text-white font-semibold px-5 py-2 rounded-xl text-xs hover:bg-aimim-darkGreen transition">
+                    Got it! Close
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- FOOTER SECTION -->
+    <footer class="bg-gray-900 text-gray-400 text-xs py-6 border-t border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-full bg-white p-0.5 flex items-center justify-center">
+                    <svg viewBox="0 0 200 200" class="w-full h-full">
+                        <circle cx="100" cy="100" r="95" fill="#006837"/>
+                        <path d="M 100 35 L 145 95 L 100 155 L 55 95 Z" fill="#ffffff"/>
+                    </svg>
+                </div>
+                <div>
+                    <p class="font-bold text-white uppercase">AIMIM STUDENT WING AKOLA</p>
+                    <p class="text-[10px] text-gray-500">Official Registration Portal</p>
+                </div>
+            </div>
+
+            <div class="text-center md:text-right space-y-1 text-[11px]">
+                <p><i class="fas fa-phone text-aimim-gold mr-1"></i> Contact: <a href="tel:9075345256" class="hover:text-white">9075345256</a></p>
+                <p><i class="fas fa-envelope text-aimim-gold mr-1"></i> Email: <a href="mailto:AIMIMSTUDENTSWINGAKOLADISTRICT@GMAIL.COM" class="hover:text-white">AIMIMSTUDENTSWINGAKOLADISTRICT@GMAIL.COM</a></p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Global Application State
+        let currentStream = null;
+        let capturedPhotoData = null;
+        let registrationData = {};
+        let photoMode = 'camera'; // 'camera' or 'gallery'
+
+        // Page Switcher Function
+        function showPage(pageId) {
+            document.getElementById('landingPage').classList.add('hidden');
+            document.getElementById('regStep1Page').classList.add('hidden');
+            document.getElementById('regStep2Page').classList.add('hidden');
+            document.getElementById('idCardPage').classList.add('hidden');
+
+            if (pageId === 'landing') {
+                document.getElementById('landingPage').classList.remove('hidden');
+                stopCamera();
+            } else if (pageId === 'regStep1') {
+                document.getElementById('regStep1Page').classList.remove('hidden');
+                stopCamera();
+            } else if (pageId === 'regStep2') {
+                document.getElementById('regStep2Page').classList.remove('hidden');
+                if (photoMode === 'camera') startCamera();
+            } else if (pageId === 'idCard') {
+                document.getElementById('idCardPage').classList.remove('hidden');
+                stopCamera();
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Handle Step 1 Form Submission
+        function handleStep1Submit(event) {
+            event.preventDefault();
+            registrationData.fullName = document.getElementById('fullName').value.trim();
+            registrationData.contact = document.getElementById('contactNumber').value.trim();
+            registrationData.email = document.getElementById('emailId').value.trim();
+            registrationData.address = document.getElementById('fullAddress').value.trim();
+
+            showPage('regStep2');
+        }
+
+        // Photo Tab Switcher (Live Camera vs Gallery Upload)
+        function switchPhotoTab(mode) {
+            photoMode = mode;
+            const tabCam = document.getElementById('tabCamera');
+            const tabGal = document.getElementById('tabGallery');
+            const camCont = document.getElementById('cameraContainer');
+            const galCont = document.getElementById('galleryContainer');
+
+            if (mode === 'camera') {
+                tabCam.className = "flex-1 py-2 rounded-lg text-xs font-bold transition bg-white text-aimim-green shadow-sm flex items-center justify-center gap-2";
+                tabGal.className = "flex-1 py-2 rounded-lg text-xs font-bold transition text-gray-600 flex items-center justify-center gap-2";
+                camCont.classList.remove('hidden');
+                galCont.classList.add('hidden');
+                startCamera();
+            } else {
+                tabGal.className = "flex-1 py-2 rounded-lg text-xs font-bold transition bg-white text-aimim-green shadow-sm flex items-center justify-center gap-2";
+                tabCam.className = "flex-1 py-2 rounded-lg text-xs font-bold transition text-gray-600 flex items-center justify-center gap-2";
+                galCont.classList.remove('hidden');
+                camCont.classList.add('hidden');
+                stopCamera();
+            }
+        }
+
+        // Start WebRTC Camera
+        async function startCamera() {
+            const video = document.getElementById('webcam');
+            const canvas = document.getElementById('photoCanvas');
+            const captureBtn = document.getElementById('captureBtn');
+            const retakeBtn = document.getElementById('retakeBtn');
+            const finishBtn = document.getElementById('finishRegBtn');
+            const status = document.getElementById('cameraStatus');
+            const overlay = document.getElementById('cameraOverlay');
+
+            video.classList.remove('hidden');
+            canvas.classList.add('hidden');
+            overlay.classList.remove('hidden');
+            captureBtn.classList.remove('hidden');
+            retakeBtn.classList.add('hidden');
+            finishBtn.disabled = true;
+            finishBtn.classList.add('bg-gray-300', 'text-gray-500', 'cursor-not-allowed');
+
+            status.textContent = "Accessing camera...";
+
+            try {
+                if (currentStream) stopCamera();
+                currentStream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } }, 
+                    audio: false 
+                });
+                video.srcObject = currentStream;
+                status.textContent = "Camera Ready. Click 'Capture Photo'.";
+            } catch (err) {
+                console.error("Camera access error:", err);
+                status.textContent = "Could not open camera. You can switch to Gallery Upload above.";
+            }
+        }
+
+        // Stop WebRTC Camera
+        function stopCamera() {
+            if (currentStream) {
+                currentStream.getTracks().forEach(track => track.stop());
+                currentStream = null;
+            }
+        }
+
+        // Take Snapshot from Webcam Canvas
+        function takeSnapshot() {
+            const video = document.getElementById('webcam');
+            const canvas = document.getElementById('photoCanvas');
+            const captureBtn = document.getElementById('captureBtn');
+            const retakeBtn = document.getElementById('retakeBtn');
+            const finishBtn = document.getElementById('finishRegBtn');
+            const status = document.getElementById('cameraStatus');
+            const overlay = document.getElementById('cameraOverlay');
+
+            if (!video.srcObject) return;
+
+            canvas.width = video.videoWidth || 640;
+            canvas.height = video.videoHeight || 480;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            capturedPhotoData = canvas.toDataURL('image/png');
+
+            video.classList.add('hidden');
+            canvas.classList.remove('hidden');
+            overlay.classList.add('hidden');
+            captureBtn.classList.add('hidden');
+            retakeBtn.classList.remove('hidden');
+            
+            enableFinishButton();
+            status.textContent = "Photo captured successfully!";
+            stopCamera();
+        }
+
+        // Handle File Upload from Gallery
+        function handleFileUpload(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                capturedPhotoData = event.target.result;
+                const preview = document.getElementById('galleryPreview');
+                const prompt = document.getElementById('uploadPrompt');
+                
+                preview.src = capturedPhotoData;
+                preview.classList.remove('hidden');
+                prompt.classList.add('hidden');
+                
+                enableFinishButton();
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function enableFinishButton() {
+            const finishBtn = document.getElementById('finishRegBtn');
+            finishBtn.disabled = false;
+            finishBtn.classList.remove('bg-gray-300', 'text-gray-500', 'cursor-not-allowed');
+            finishBtn.classList.add('bg-aimim-green', 'hover:bg-aimim-darkGreen', 'text-white');
+        }
+
+        // Finalize Registration and Generate Unique AIMIM_STU-AGY- Serial Number
+        function completeRegistration() {
+            if (!capturedPhotoData) {
+                alert("Please take a live photo or upload one from your gallery!");
+                return;
+            }
+
+            // Generate Serial Registration Number (Starting at AIMIM_STU-AGY-1001)
+            let currentSerial = localStorage.getItem('aimim_stu_serial');
+            if (!currentSerial) {
+                currentSerial = 1001;
+            } else {
+                currentSerial = parseInt(currentSerial) + 1;
+            }
+            localStorage.setItem('aimim_stu_serial', currentSerial);
+
+            const regNumber = `AIMIM_STU-AGY-${currentSerial}`;
+            registrationData.regNum = regNumber;
+            registrationData.photo = capturedPhotoData;
+
+            // 1. Local Data Storage
+            let existingMembers = JSON.parse(localStorage.getItem('aimim_members') || '[]');
+            existingMembers.push(registrationData);
+            localStorage.setItem('aimim_members', JSON.stringify(existingMembers));
+
+            // 2. Google Sheets Webhook Dispatch (If Webhook URL is set)
+            const webhookUrl = localStorage.getItem('aimim_webhook_url');
+            if (webhookUrl) {
+                fetch(webhookUrl, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(registrationData)
+                }).catch(err => console.log('Webhook push error:', err));
+            }
+
+            // Populate ID Card Details
+            document.getElementById('cardRegNum').textContent = regNumber;
+            document.getElementById('cardFullName').textContent = registrationData.fullName;
+            document.getElementById('cardContact').textContent = registrationData.contact;
+            document.getElementById('cardEmail').textContent = registrationData.email;
+            document.getElementById('cardAddress').textContent = registrationData.address;
+            document.getElementById('cardUserPhoto').src = capturedPhotoData;
+
+            showPage('idCard');
+        }
+
+        // Download ID Card PNG File
+        function downloadIDCard() {
+            const cardElem = document.getElementById('printableCard');
+            html2canvas(cardElem, { scale: 3, useCORS: true }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = `${registrationData.regNum || 'AIMIM_ID_Card'}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            });
+        }
+
+        // Webhook Modal Operations
+        function toggleWebhookModal() {
+            const modal = document.getElementById('webhookModal');
+            modal.classList.toggle('hidden');
+            const savedUrl = localStorage.getItem('aimim_webhook_url') || '';
+            document.getElementById('webhookUrlInput').value = savedUrl;
+        }
+
+        function saveWebhookUrl() {
+            const url = document.getElementById('webhookUrlInput').value.trim();
+            localStorage.setItem('aimim_webhook_url', url);
+            alert('Google Sheets Webhook URL saved successfully!');
+            toggleWebhookModal();
+        }
+
+        function toggleGuideModal() {
+            const modal = document.getElementById('guideModal');
+            modal.classList.toggle('hidden');
+        }
+    </script>
+</body>
+</html>
